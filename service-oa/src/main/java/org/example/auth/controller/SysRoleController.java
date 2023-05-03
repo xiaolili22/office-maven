@@ -6,15 +6,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.example.auth.service.SysRoleService;
-import org.example.common.config.CustomException;
 import org.example.common.result.Result;
 import org.example.model.system.SysRole;
+import org.example.vo.system.AssignRoleVo;
 import org.example.vo.system.SysRoleQueryVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "角色管理接口")
 @RestController
@@ -23,6 +24,20 @@ public class SysRoleController {
 
     @Autowired
     private SysRoleService sysRoleService;
+
+    @ApiOperation("获取角色")
+    @GetMapping("/toAssign/{userId}")
+    public Result toAssign(@PathVariable Long userId) {
+        Map<String, Object> map = sysRoleService.findRoleDataByUserId(userId);
+        return Result.ok(map);
+    }
+
+    @ApiOperation("分配角色")
+    @PostMapping("/doAssign")
+    public Result doAssign(@RequestBody AssignRoleVo assignRoleVo) {
+        sysRoleService.doAssign(assignRoleVo);
+        return Result.ok();
+    }
 
     @ApiOperation("查询所有角色")
     @GetMapping("/findAll")
