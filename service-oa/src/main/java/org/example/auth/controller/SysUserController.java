@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.example.auth.service.SysUserService;
 import org.example.common.result.Result;
+import org.example.common.utils.MD5;
 import org.example.model.system.SysUser;
 import org.example.vo.system.SysUserQueryVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,8 @@ public class SysUserController {
     @ApiOperation(value = "保存用户")
     @PostMapping("save")
     public Result save(@RequestBody SysUser sysUser) {
+        String password = MD5.encrypt(sysUser.getPassword());
+        sysUser.setPassword(password);
         sysUserService.save(sysUser);
         return Result.ok();
     }
