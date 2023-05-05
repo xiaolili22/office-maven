@@ -1,9 +1,7 @@
 package org.example.auth.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.jsonwebtoken.Jwt;
 import io.swagger.annotations.Api;
-import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
 import org.example.auth.service.SysMenuService;
 import org.example.auth.service.SysUserService;
 import org.example.common.config.CustomException;
@@ -17,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,14 +59,14 @@ public class IndexController {
         String token = JwtHelper.createToken(sysUser.getId(), sysUser.getUsername());
         Map<String, Object> map = new HashMap<>();
         map.put("token", token);
-        return Result.ok(token);
+        return Result.ok(map);
     }
 
     // Info
     @GetMapping("info")
     public Result info(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("header");
-        Long userId = 2L; //JwtHelper.getUserId(token);
+        String token = httpServletRequest.getHeader("token");
+        Long userId = JwtHelper.getUserId(token);
         SysUser sysUser = sysUserService.getById(userId);
         List<RouterVo> routerVoList = sysMenuService.findUserMenuListByUserId(userId);
         List<String> permsList = sysMenuService.findUserPermsByUserId(userId);

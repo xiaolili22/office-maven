@@ -11,7 +11,6 @@ import org.example.model.system.SysUserRole;
 import org.example.vo.system.AssignRoleVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -50,7 +49,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         return roleMap;
     }
 
-    @Transactional
     @Override
     public void doAssign(AssignRoleVo assignRoleVo) {
         LambdaQueryWrapper<SysUserRole> wrapper = new LambdaQueryWrapper<>();
