@@ -1,5 +1,6 @@
 package org.example.security.filter;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.common.jwt.JwtHelper;
 import org.example.common.result.ResponseUtil;
@@ -8,6 +9,7 @@ import org.example.common.result.ResultCodeEnum;
 import org.example.model.system.SysUser;
 import org.example.security.custom.CustomUser;
 import org.example.vo.system.LoginVo;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,11 +27,15 @@ import java.util.Map;
 
 public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    public TokenLoginFilter(AuthenticationManager authenticationManager) {
+    private RedisTemplate redisTemplate;
+
+    public TokenLoginFilter(AuthenticationManager authenticationManager,
+                            RedisTemplate redisTemplate) {
         this.setAuthenticationManager(authenticationManager);
         this.setPostOnly(false);
         //指定登录接口及提交方式，可以指定任意路径
         this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/system/index/login","POST"));
+        this.redisTemplate = redisTemplate;
     }
 
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -54,6 +60,10 @@ public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomUser customUser = (CustomUser) auth.getPrincipal();
         String token = JwtHelper.createToken(customUser.getSysUser().getId(),
                 customUser.getSysUser().getUsername());
+
+        redisTemplate.opsForValue().set(customUser.getUsername(),
+                JSON.toJSONString(customUser.getAuthorities()));
+
         Map<String, Object> map = new HashMap<>();
         map.put("token", token);
         ResponseUtil.out(response, Result.ok(map));
